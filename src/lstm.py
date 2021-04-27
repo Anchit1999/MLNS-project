@@ -154,7 +154,7 @@ def generate_text(pmodel, num_generate, temperature, start_string):
 
 #--------------------------------------------------
 # Read trajectory
-infile = 'datasets/synthetic/xvyw1beta9.5gammax1.0gammay1.0epsln1.0sgma1.0A1.0x01.122w0.8B0.15a1.0_h0.01_mix1.txt'
+infile = '../datasets/synthetic/xvyw1beta9.5gammax1.0gammay1.0epsln1.0sgma1.0A1.0x01.122w0.8B0.15a1.0_h0.01_mix1.txt'
 input_x, input_y = np.loadtxt(infile, unpack=True, usecols=(0,1), skiprows=1)
 
 input_x = running_mean(input_x, sm_length)
@@ -176,7 +176,7 @@ dataset = dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE, drop_remainder=True)
 
 #--------------------------------------------------
 # Read and use the same trajectory as the validation data:
-infile_v = 'datasets/synthetic/xvyw1beta9.5gammax1.0gammay1.0epsln1.0sgma1.0A1.0x01.122w0.8B0.15a1.0_h0.01_mix1.txt'
+infile_v = '../datasets/synthetic/xvyw1beta9.5gammax1.0gammay1.0epsln1.0sgma1.0A1.0x01.122w0.8B0.15a1.0_h0.01_mix1.txt'
 input_xv, input_yv = np.loadtxt(infile_v, unpack=True, usecols=(0,1), skiprows=1)
 
 input_xv = running_mean(input_xv, sm_length)
@@ -197,7 +197,7 @@ vdataset = vdataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE, drop_remainder=True)
 
 #--------------------------------------------------
 # Read the same trajectory and use the first few to activate the model for prediction
-infile_p = 'datasets/synthetic/xvyw1beta9.5gammax1.0gammay1.0epsln1.0sgma1.0A1.0x01.122w0.8B0.15a1.0_h0.01_mix1.txt'
+infile_p = '../datasets/synthetic/xvyw1beta9.5gammax1.0gammay1.0epsln1.0sgma1.0A1.0x01.122w0.8B0.15a1.0_h0.01_mix1.txt'
 input_xp, input_yp = np.loadtxt(infile_p, unpack=True, usecols=(0,1), skiprows=1)
 
 idx_xp = map(lambda x: find_nearest(X, x), input_xp)
@@ -211,7 +211,7 @@ text4activation = idx_2dp[:1000]#idx_2dp[:100000]
 #--------------------------------------------------
 # Decide whether to use GPU and build model of training
 if tf.test.is_gpu_available():
-    rnn = tf.keras.layers.CuDNNLSTM
+    rnn = tf.keras.layers.LSTM
 else:
     import functools
     rnn = functools.partial(
@@ -244,23 +244,23 @@ v_steps_per_epoch=v_examples_per_epoch//BATCH_SIZE
 history = model.fit(dataset.repeat(EPOCHS), epochs=EPOCHS, steps_per_epoch=steps_per_epoch, validation_data=vdataset.repeat(EPOCHS), validation_steps=v_steps_per_epoch, callbacks=[checkpoint_callback], verbose=1)
 
 #--------------------------------------------------
-# Rebuild model with batch_size=1:
-# pmodel = build_model(vocab_size, embedding_dim, rnn_units, batch_size=1)
-# pmodel.load_weights(tf.train.latest_checkpoint(checkpoint_dir))
-# pmodel.build(tf.TensorShape([1, None]))
-# print(pmodel.summary())
+#Rebuild model with batch_size=1:
+pmodel = build_model(vocab_size, embedding_dim, rnn_units, batch_size=1)
+pmodel.load_weights(tf.train.latest_checkpoint(checkpoint_dir))
+pmodel.build(tf.TensorShape([1, None]))
+print(pmodel.summary())
 
-# # Print the length of seed for activating the model
-# print('length of seed: {}'.format(len(text4activation)))
-
-# #--------------------------------------------------
-# # Generate prediction sequentially:
-# start0 = time.time()
-# prediction=generate_text(pmodel, num_generate, temperature, start_string=text4activation)
-# print ('Time taken for total {} sec\n'.format(time.time() - start0))
+# Print the length of seed for activating the model
+print('length of seed: {}'.format(len(text4activation)))
 
 #--------------------------------------------------
+# Generate prediction sequentially:
+start0 = time.time()
+prediction=generate_text(pmodel, num_generate, temperature, start_string=text4activation)
+print ('Time taken for total {} sec\n'.format(time.time() - start0))
+
+#-------------------------------------------------
 # Save prediction:
-#np.savetxt('prediction',prediction[1:])
+np.savetxt('prediction',prediction[1:])
 
 print("Done")
