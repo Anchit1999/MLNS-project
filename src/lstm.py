@@ -10,12 +10,13 @@ from get_loss import sparse_categorical_crossentropy
 # Parameters and dictionaries
 
 # Number of bins and smoothen length
-num_bins=4
+num_bins=3
 sm_length=50
 threshold=100
 
 # x-values of the metastable states in the 4-state model potential.
-X=[2.0, 0.5, -0.5, -2.0] 
+# X=[2.0, 0.5, -0.5, -2.0] 
+X = [-1.5,0,1.5]
 
 # Labels of all possible states in the ranges we considered.
 # For 2d systems, this is not the same as the number of representative values.
@@ -154,7 +155,7 @@ def generate_text(pmodel, num_generate, temperature, start_string):
 
 #--------------------------------------------------
 # Read trajectory
-infile = '../datasets/synthetic/xvyw1beta9.5gammax1.0gammay1.0epsln1.0sgma1.0A1.0x01.122w0.8B0.15a1.0_h0.01_mix1.txt'
+infile = '../datasets/synthetic/three_state/xvyw2beta9.5gammax1.0gammay1.0epsln1.0sgma1.0A1.0x01.122w0.5B0.15a1.0_h0.01_1.txt'
 input_x, input_y = np.loadtxt(infile, unpack=True, usecols=(0,1), skiprows=1)
 
 input_x = running_mean(input_x, sm_length)
@@ -176,7 +177,7 @@ dataset = dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE, drop_remainder=True)
 
 #--------------------------------------------------
 # Read and use the same trajectory as the validation data:
-infile_v = '../datasets/synthetic/xvyw1beta9.5gammax1.0gammay1.0epsln1.0sgma1.0A1.0x01.122w0.8B0.15a1.0_h0.01_mix1.txt'
+infile_v = '../datasets/synthetic/three_state/xvyw2beta9.5gammax1.0gammay1.0epsln1.0sgma1.0A1.0x01.122w0.5B0.15a1.0_h0.01_1.txt'
 input_xv, input_yv = np.loadtxt(infile_v, unpack=True, usecols=(0,1), skiprows=1)
 
 input_xv = running_mean(input_xv, sm_length)
@@ -197,7 +198,7 @@ vdataset = vdataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE, drop_remainder=True)
 
 #--------------------------------------------------
 # Read the same trajectory and use the first few to activate the model for prediction
-infile_p = '../datasets/synthetic/xvyw1beta9.5gammax1.0gammay1.0epsln1.0sgma1.0A1.0x01.122w0.8B0.15a1.0_h0.01_mix1.txt'
+infile_p = '../datasets/synthetic/three_state/xvyw2beta9.5gammax1.0gammay1.0epsln1.0sgma1.0A1.0x01.122w0.5B0.15a1.0_h0.01_1.txt'
 input_xp, input_yp = np.loadtxt(infile_p, unpack=True, usecols=(0,1), skiprows=1)
 
 idx_xp = map(lambda x: find_nearest(X, x), input_xp)
@@ -261,6 +262,6 @@ print ('Time taken for total {} sec\n'.format(time.time() - start0))
 
 #-------------------------------------------------
 # Save prediction:
-np.savetxt('prediction',prediction[1:])
+np.savetxt('prediction_2.txt',prediction[1:])
 
 print("Done")

@@ -30,7 +30,7 @@ device = torch.device("cpu")
 # In[4]:
 
 
-num_bins=3
+num_bins=4
 sm_length=20
 def running_mean(x, N):
     """Use convolution to do running average."""
@@ -69,7 +69,8 @@ def Rm_peaks_steps(traj):
 
 
 
-X = [1.5, 0, -1.5]
+# X = [1.5, 0, -1.5]
+X=[2.0, 0.5, -0.5, -2.0] 
 input_x = running_mean(input_x, sm_length) # smooothen data.
 idx_x = map(lambda x: find_nearest(X, x), input_x) # convert to three bins.
 
@@ -163,7 +164,7 @@ def batch_data(x, batch_size):
     return y.reshape((num_dataset, batch_size))
 
 
-EPOCHS = 20
+EPOCHS = 5
 sequence_len = 100
 shift=1
 batch_size=64
@@ -227,7 +228,7 @@ def generate_text(start_string):
         
         text_generated = np.vstack((text_generated, idx2char[predicted_id].tolist()))
 
-    return text_generated
+    return text_generated[1:]
 
 
 # In[220]:
@@ -235,7 +236,8 @@ def generate_text(start_string):
 
 text = idx_2d[:1000]
 prediction=generate_text(text)
-
+print(prediction.shape)
+print(np.sum(prediction==text_as_int[1000:2000]))
 
 # In[3]:
 
@@ -263,17 +265,19 @@ plt.savefig('abc1.png')
 # In[7]:
 
 
-print(np.where(prediction==0)[0].shape)
+# print(np.where(prediction==0)[0].shape)
 
 
-# In[8]:
+# # In[8]:
 
 
-print(np.where(prediction==1)[0].shape)
+# print(np.where(prediction==1)[0].shape)
 
 
-# In[9]:
+# # In[9]:
 
 
-print(np.where(prediction==2)[0].shape)
+# print(np.where(prediction==2)[0].shape)
 
+# print(np.ravel(prediction[1:2000]))
+# print(text_as_int[1:2000])

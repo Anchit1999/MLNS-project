@@ -17,7 +17,7 @@ from torch.utils.data import Dataset, DataLoader
 # In[141]:
 
 
-infile = '../ChronoLSTM_1d_bin3/DATA_Linear/xvyw1beta9.5gammax1.0gammay1.0epsln1.0sgma1.0A1.0x01.122w0.8B0.15a1.0_h0.01_mix1.txt'
+infile = '../datasets/synthetic/xvyw1beta9.5gammax1.0gammay1.0epsln1.0sgma1.0A1.0x01.122w0.8B0.15a1.0_h0.01_mix1.txt'
 input_x, _=np.loadtxt(infile, unpack=True, max_rows=100000)
 
 
@@ -82,7 +82,13 @@ text = idx_2d
 all_combs = [i for i in range(num_bins)]
 vocab=sorted(all_combs)
 
-
+vocab_size = len(vocab)
+# The embedding dimension
+embedding_dim = 8
+# Number of RNN units
+rnn_units = 32
+# Batch size
+batch_size=64
 # In[144]:
 
 
@@ -187,13 +193,7 @@ dataset = seq_data(text_as_int, 100, 1)
 dataset = DataLoader(dataset, batch_size=64, shuffle=True, drop_last=True)
 
 # Length of the vocabulary in chars
-vocab_size = len(vocab)
-# The embedding dimension
-embedding_dim = 8
-# Number of RNN units
-rnn_units = 32
-# Batch size
-batch_size=64
+
 
 model = NLP(vocab_size, embedding_dim, rnn_units, batch_size).to(device)
 print(model)
